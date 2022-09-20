@@ -1,0 +1,65 @@
+package SS.Spring.spring.Controller;
+
+import SS.Spring.spring.model.Contact;
+import SS.Spring.spring.service.ContactService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.validation.Valid;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+@Slf4j
+@Controller
+public class ContactController {
+
+    private final ContactService contactService;
+    @Autowired
+    public ContactController(ContactService contactService)
+    {
+        this.contactService=contactService;
+    }
+    @RequestMapping(value = {"/contact"})
+            public String displayContactPage(Model model)
+    {
+        model.addAttribute("contact",new Contact());
+        return "contact.html";
+    }
+
+
+
+
+
+
+
+    //@RequestMapping(value = "/saveMsg",method = POST)
+  /*  @PostMapping(value = "/saveMsg" )
+    public ModelAndView saveMessage(@RequestParam String name,@RequestParam String mobileNum,@RequestParam String email,
+                                    @RequestParam String subject, @RequestParam String message)
+    {
+        log.info("Name :" +name);
+        log.info("MobileNo :"+mobileNum);
+        log.info("Email :"+email);
+        log.info("Subject :"+subject);
+        log.info("Message :"+message);
+        return new ModelAndView("redirect:/contact");
+
+    }*/
+    @RequestMapping(value = "/saveMsg",method = POST)
+    public String saveMessage(@Valid @ModelAttribute("contact") Contact contact, Errors errors) {
+        if(errors.hasErrors())
+        {
+            log.error("Contact from validation failed due to: "+errors.toString());
+            return "contact.html";
+
+        }
+        contactService.saveMessageDetails(contact);
+        return new String("redirect:/contact");
+    }
+
+}
